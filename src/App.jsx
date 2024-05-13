@@ -1,4 +1,4 @@
-import { RouterProvider } from 'react-router-dom'
+import { RouterProvider, redirect } from 'react-router-dom'
 import './App.css'
 import { AuthRouter } from './routers/AuthRouter.jsx'
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -21,6 +21,12 @@ axios.defaults.withCredentials = true
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const api = import.meta.env.VITE_API_URL
+  const logout = () => {
+    localStorage.removeItem("access")
+    localStorage.removeItem("refresh")
+    setIsAuthenticated(false)
+    redirect("/")
+  }
   useEffect(() => {
     const token = `Bearer ${localStorage.getItem("access")}`
     const headers = {'Content-Type': "application/json", "Authorization": token}
@@ -59,7 +65,13 @@ return (
     {!isAuthenticated ?
     <RouterProvider router = {AuthRouter} />
     :
-    <div>Welcome!</div>
+    <>
+    <div className="flex items-center">
+      <div className="me-2">Welcome!</div>
+      <button className="px-3 py-1 bg-blue-400 rounded text-white" onClick = {logout}>Logout</button>
+    </div>
+    </>
+    
     }
     </AuthContextProvider>
     </>

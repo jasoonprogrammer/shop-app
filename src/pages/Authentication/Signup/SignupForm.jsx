@@ -3,8 +3,10 @@ import signupImage from "./assets/sign_up.jpg"
 import axios from "axios"
 import TailwindInput from "../../../components/TailwindInput"
 import { AuthContext } from "../../../context/AuthContextProvider"
+import { redirect, useNavigate } from "react-router-dom"
 
 const SignupForm = () => {
+    const nav = useNavigate()
     const { setIsAuthenticated } = useContext(AuthContext)
     const [username, setUsername] = useState('')
     const [email1, setEmail1] = useState('')
@@ -20,19 +22,24 @@ const SignupForm = () => {
     const api = import.meta.env.VITE_API_URL
     const register = e => {
         e.preventDefault();
+        let hasError = false
         if(email1 !== email2) {
-            setEmailMismatch('Emails dont match')
+            setEmailMismatch(current => 'Emails dont match')
+            hasError = true
         }
         else {
-            setEmailMismatch('')
+            setEmailMismatch(current => '')
         }
         if(password1 !== password2) {
-            setPasswordMismatch('Passwords dont match')
+            setPasswordMismatch(current => 'Passwords dont match')
+            hasError = true
         } else {
-            setPasswordMismatch('')
+            setPasswordMismatch(current => '')
         }
 
-        if(!passwordMismatch && !emailMismatch) {
+
+        if(!hasError) {
+            console.log("aOk")
             axios.post(`${api}/user/create/`, {
                 username: username,
                 password: password1,
@@ -46,6 +53,7 @@ const SignupForm = () => {
                         console.log(res)
                         localStorage.setItem("access", res.data.access)
                         localStorage.setItem("refresh", res.data.refresh)
+                        nav("/")
                         setIsAuthenticated(true)
                     }
                 )
